@@ -49,7 +49,6 @@ let keyword_table =
     "false", FALSE;
     "for", FOR;
     "fun", FUN;
-    "lambda", FUN;
     "function", FUNCTION;
     "functor", FUNCTOR;
     "if", IF;

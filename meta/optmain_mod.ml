@@ -14,6 +14,9 @@ open Config
 open Clflags
 open Compenv
 
+module Optcompile = Optcompile_mod
+
+
 let process_interface_file ppf name =
   Optcompile.interface ppf name (output_prefix name)
 
