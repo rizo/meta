@@ -5,7 +5,7 @@ _Hackish experiments with the OCaml compiler infrastructure._
 
 **Meta** is a custom front-end for the OCaml compiler built with the _compiler-libs_ package. It extends and simplifies the OCaml syntax but remains a superset of OCaml, which means that any valid OCaml code is also a valid Meta code.
 
-Here is a small example of how meta looks:
+Here is a small example of how Meta looks:
 
 ```agda
 type person = {
