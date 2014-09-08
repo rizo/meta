@@ -155,7 +155,6 @@ let file ppf ~tool_name inputfile parse_fun ast_magic =
         seek_in ic 0;
         Location.input_name := inputfile;
         let lexbuf = Lexing.from_channel ic in
-        print_endline "hello lexbuf";
         Location.init lexbuf inputfile;
         parse_fun lexbuf
       end

@@ -10,7 +10,8 @@
 (*                                                                     *)
 (***********************************************************************)
 
-module Lexer = Lexer_mod
+module Lexer  = Lexer_mod
+module Parser = Parser_mod
 
 (* Entry points in the parser *)
 

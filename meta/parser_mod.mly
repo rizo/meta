@@ -1095,6 +1095,11 @@ expr:
         mkexp_attrs (Pexp_fun(l, o, p, $4)) $2 }
   | FUN ext_attributes LPAREN TYPE LIDENT RPAREN fun_def
       { mkexp_attrs (Pexp_newtype($5, $7)) $2 }
+
+  | FUN ext_attributes STAR MINUSGREATER seq_expr
+      { let p = Pat.var (mkloc "_args" (symbol_rloc ())) in
+        mkexp_attrs (Pexp_fun("", None, p, $5)) $2 }
+
   | MATCH ext_attributes seq_expr WITH opt_bar match_cases
       { mkexp_attrs (Pexp_match($3, List.rev $6)) $2 }
   | TRY ext_attributes seq_expr WITH opt_bar match_cases

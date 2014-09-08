@@ -15,7 +15,7 @@
 {
 open Lexing
 open Misc
-open Parser
+open Parser_mod
 
 type error =
   | Illegal_character of char
@@ -49,6 +49,7 @@ let keyword_table =
     "false", FALSE;
     "for", FOR;
     "fun", FUN;
+    "lambda", FUN;
     "function", FUNCTION;
     "functor", FUNCTOR;
     "if", IF;
@@ -286,14 +287,9 @@ let float_literal =
   (['e' 'E'] ['+' '-']? ['0'-'9'] ['0'-'9' '_']*)?
 
 rule token = parse
-  | "\\" newline {
-      match !preprocessor with
-      | None ->
-        raise (Error(Illegal_character (Lexing.lexeme_char lexbuf 0),
-                     Location.curr lexbuf))
-      | Some _ ->
-        update_loc lexbuf None 1 false 0;
-        token lexbuf }
+  | "\\" { INFIXOP1("@@") }
+  | "λ" { FUN }
+  | "λ" [' ' '\t' '\n'] * '|' { FUNCTION }
   | newline
       { update_loc lexbuf None 1 false 0;
         match !preprocessor with
@@ -430,6 +426,7 @@ rule token = parse
   | "*"  { STAR }
   | ","  { COMMA }
   | "->" { MINUSGREATER }
+  | "→"  { MINUSGREATER }
   | "."  { DOT }
   | ".." { DOTDOT }
   | ":"  { COLON }
@@ -440,9 +437,11 @@ rule token = parse
   | ";;" { SEMISEMI }
   | "<"  { LESS }
   | "<-" { LESSMINUS }
+  | "←"  { LESSMINUS }
   | "="  { EQUAL }
   | "["  { LBRACKET }
   | "[|" { LBRACKETBAR }
+  | "⟦" { LBRACKETBAR }
   | "[<" { LBRACKETLESS }
   | "[>" { LBRACKETGREATER }
   | "]"  { RBRACKET }
@@ -451,6 +450,7 @@ rule token = parse
   | "|"  { BAR }
   | "||" { BARBAR }
   | "|]" { BARRBRACKET }
+  | "⟧" { BARRBRACKET }
   | ">"  { GREATER }
   | ">]" { GREATERRBRACKET }
   | "}"  { RBRACE }
@@ -483,7 +483,6 @@ rule token = parse
   | '%'     { PERCENT }
   | ['*' '/' '%'] symbolchar *
             { INFIXOP3(Lexing.lexeme lexbuf) }
-  | '\\' { INFIXOP1("@@") }
   | eof { EOF }
   | _
       { raise (Error(Illegal_character (Lexing.lexeme_char lexbuf 0),

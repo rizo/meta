@@ -6,7 +6,7 @@ OCAMLLEX  = ocamllex
 OCAMLYACC = ocamlyacc
 COMPFLAGS = -I +compiler-libs -I +unix
 
-MODULES = lexer_mod parser_mod parse_mod pparse_mod compile_mod main
+MODULES = parser_mod lexer_mod parse_mod pparse_mod compile_mod main
 OBJECTS = $(addsuffix .cmo, $(MODULES))
 
 # Main Target
@@ -17,14 +17,20 @@ meta: $(OBJECTS)
 clean::
 	rm -f meta
 
+parser_mod.cmo:
+	$(OCAMLYACC) -v parser_mod.mly
+	$(OCAMLC) $(COMPFLAGS) -c parser_mod.mli
+	$(OCAMLC) $(COMPFLAGS) -c parser_mod.ml
+
+
 # Generic Rules
 
 .SUFFIXES: .mll .mly .ml .mli .cmo .cmi .cmx
 
-.ml.cmo:
+.mli.cmi:
 	$(OCAMLC) $(COMPFLAGS) -c $<
 
-.mli.cmi:
+.ml.cmo:
 	$(OCAMLC) $(COMPFLAGS) -c $<
 
 .ml.cmx:
@@ -40,7 +46,7 @@ clean::
 	$(OCAMLYACC) -v $<
 
 clean::
-	rm -f *.cm* *.annot
+	rm -f *.cm* *.annot *.output
 
 # depend:
 # 	ocamldep $(INCLUDES) *.mli *.ml > .depend
