@@ -23,14 +23,7 @@ let print_person_record = λ {name; age} →
 		" Age: " ^ string_of_int age ^ "\n"
 
 
-let print_person_star = λ * →
-	print_endline \
-		"Name: " ^ fst _args ^ "\n" ^
-		" Age: " ^ string_of_int (snd _args) ^ "\n"
-
-
 let () =
 	print_person_record {name = "Eve"; age = 19};
 	print_person_args "Adam" 20;
-	print_person_tuple ("Eve", 19);
-	print_person_star ("Eve", 19)
+	print_person_tuple ("Eve", 19)
