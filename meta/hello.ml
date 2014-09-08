@@ -5,20 +5,20 @@ type person = {
 }
 
 
-let print_person_args = λ name age →
-	print_endline \
+let print_person_args : string → int → unit =
+	λ name age → print_endline \
 		"Name: " ^ name ^ "\n" ^
 		" Age: " ^ string_of_int age ^ "\n"
 
 
-let print_person_tuple = λ (name, age) →
-	print_endline \
+let print_person_tuple : (string * int) → unit =
+	λ (name, age) → print_endline \
 		"Name: " ^ name ^ "\n" ^
 		" Age: " ^ string_of_int age ^ "\n"
 
 
-let print_person_record = λ {name; age} →
-	print_endline \
+let print_person_record : person → unit =
+	λ {name; age} → print_endline \
 		"Name: " ^ name ^ "\n" ^
 		" Age: " ^ string_of_int age ^ "\n"
 

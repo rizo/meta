@@ -6,13 +6,22 @@ OCAMLLEX  = ocamllex
 OCAMLYACC = ocamlyacc
 COMPFLAGS = -I +compiler-libs -I +unix
 
-MODULES = parser_mod lexer_mod parse_mod pparse_mod compile_mod main
-OBJECTS = $(addsuffix .cmo, $(MODULES))
+BYTE_MODULES = parser_mod lexer_mod parse_mod pparse_mod compile_mod main
+BYTE_OBJECTS = $(addsuffix .cmo, $(BYTE_MODULES))
+BYTE_DEPS    = ocamlcommon.cma ocamlbytecomp.cma
+
+OPT_MODULES = parser_mod lexer_mod parse_mod pparse_mod optcompile_mod optmain
+OPT_OBJECTS = $(addsuffix .cmo, $(OPT_MODULES))
+OPT_DEPS    = ocamlcommon.cma ocamloptcomp.cma
 
 # Main Target
 
-meta: $(OBJECTS)
-	$(OCAMLC) -o $@ $(COMPFLAGS) ocamlcommon.cma ocamlbytecomp.cma $(OBJECTS)
+meta.byte: $(BYTE_OBJECTS)
+	$(OCAMLOPT) -o $@ $(COMPFLAGS) $(BYTE_DEPS) $(BYTE_OBJECTS)
+
+
+meta.opt: $(OBJECTS)
+	$(OCAMLOPT) -o $@ $(COMPFLAGS) $(OPT_DEPS) $(OPT_OBJECTS)
 
 clean::
 	rm -f meta
@@ -47,6 +56,13 @@ parser_mod.cmo:
 
 clean::
 	rm -f *.cm* *.annot *.output
+
+hello: meta.opt
+	./meta.opt hello.ml -o hello
+	./hello
+
+clean::
+	rm -f ./hello
 
 # depend:
 # 	ocamldep $(INCLUDES) *.mli *.ml > .depend
