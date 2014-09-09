@@ -7,7 +7,7 @@ _Hackish experiments with the OCaml compiler infrastructure._
 
 Here is a small example of how Meta looks:
 
-```agda
+```haskell
 
 (* Function examples *)
 
