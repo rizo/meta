@@ -7,7 +7,21 @@ _Hackish experiments with the OCaml compiler infrastructure._
 
 Here is a small example of how Meta looks:
 
-```agda
+```
+
+(* Function examples *)
+
+(** Identity function *)
+let id : 'a → 'a = λ x → x
+
+
+(** Function composition. *)
+let compose : ('a → 'b) → ('c → 'a) → 'c → 'b =
+	λ f g x → f \ g x
+
+
+(* Type printing. *)
+
 type person = {
 	name: string;
 	age: int
