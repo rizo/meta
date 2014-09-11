@@ -286,9 +286,16 @@ let float_literal =
   (['e' 'E'] ['+' '-']? ['0'-'9'] ['0'-'9' '_']*)?
 
 rule token = parse
-  | "\\" { INFIXOP1("@@") }
-  | "λ" { FUN }
-  | "λ" [' ' '\t' '\n'] * '|' { FUNCTION }
+  | "\\" { INFIXOP1 "@@" }
+  | "λ"  { FUN }
+  | "λ" [' ' '\t' '\n'] * '|'
+         { FUNCTION }
+  | "¬"  { PREFIXOP "not" }
+  | "∘"  { INFIXOP1 "<<" }
+  | "∧"  { INFIXOP1 "&&" }
+  | "∨"  { INFIXOP1 "||" }
+  | "⇔" { INFIXOP1 "<=>" }
+  | "⇒" { INFIXOP1 "=>" }
   | newline
       { update_loc lexbuf None 1 false 0;
         match !preprocessor with

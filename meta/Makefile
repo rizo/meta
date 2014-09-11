@@ -4,7 +4,9 @@ OCAMLOPT  = ocamlopt -annot -bin-annot
 OCAMLDEP  = ocamldep
 OCAMLLEX  = ocamllex
 OCAMLYACC = ocamlyacc
-COMPFLAGS = -I +compiler-libs
+
+BUILD_DIR = build
+COMPFLAGS = -I +compiler-libs -I $(BUILD_DIR)
 
 BYTE_MODULES = parser_mod lexer_mod parse_mod pparse_mod compile_mod main_mod
 BYTE_OBJECTS = $(addsuffix .cmo, $(BYTE_MODULES))
@@ -14,64 +16,61 @@ OPT_MODULES = parser_mod lexer_mod parse_mod pparse_mod optcompile_mod optmain_m
 OPT_OBJECTS = $(addsuffix .cmx, $(OPT_MODULES))
 OPT_DEPS    = ocamlcommon.cmxa ocamloptcomp.cmxa
 
-# Main Target
+default: build meta.native
+
+build:
+	mkdir -p build
 
 meta.byte: $(BYTE_OBJECTS)
-	$(OCAMLC) -o $@ $(COMPFLAGS) $(BYTE_DEPS) $(BYTE_OBJECTS)
-
+	$(OCAMLC) -o $(BUILD_DIR)/$@ $(COMPFLAGS) $(BYTE_DEPS) $(BYTE_OBJECTS)
+	ln -s $(BUILD_DIR)/$@ ./$@
 
 meta.native: $(OPT_OBJECTS)
-	$(OCAMLOPT) -o $@ $(COMPFLAGS) $(OPT_DEPS) $(OPT_OBJECTS)
+	$(OCAMLOPT) -o $(BUILD_DIR)/$@ $(COMPFLAGS) $(OPT_DEPS) $(OPT_OBJECTS)
+	ln -s $(BUILD_DIR)/$@ ./$@
 
 clean::
 	rm -f meta.*
 
-parser_mod.cmo:
-	$(OCAMLYACC) -v parser_mod.mly
-	$(OCAMLC) $(COMPFLAGS) -c parser_mod.mli
-	$(OCAMLC) $(COMPFLAGS) -c parser_mod.ml
-
-clean::
-	rm -f parser_mod.ml{,i}
-
-parser_mod.cmx:
-	$(OCAMLYACC) -v parser_mod.mly
-	$(OCAMLOPT) $(COMPFLAGS) -c parser_mod.mli
-	$(OCAMLOPT) $(COMPFLAGS) -c parser_mod.ml
-
-
-# Generic Rules
-
 .SUFFIXES: .mll .mly .ml .mli .cmo .cmi .cmx
 
 .mli.cmi:
-	$(OCAMLC) $(COMPFLAGS) -c $<
+	$(OCAMLC) $(COMPFLAGS) -o $(BUILD_DIR)/$@ -c $<
 
 .ml.cmo:
-	$(OCAMLC) $(COMPFLAGS) -c $<
+	$(OCAMLC) $(COMPFLAGS) -o $(BUILD_DIR)/$@ -c $<
 
 .ml.cmx:
-	$(OCAMLOPT) $(COMPFLAGS) -c $<
+	$(OCAMLOPT) $(COMPFLAGS) -o $(BUILD_DIR)/$@ -c $<
 
 .mll.ml:
 	$(OCAMLLEX) $<
 
-.mly.ml:
-	$(OCAMLYACC) -v $<
+%.mli %.ml %.cmx: %.mly
+	$(OCAMLYACC) -v -b $(BUILD_DIR)/$* $<
+	$(OCAMLOPT) $(COMPFLAGS) -o $(BUILD_DIR)/$*.cmi -c $(BUILD_DIR)/$*.mli
+	$(OCAMLOPT) $(COMPFLAGS) -o $(BUILD_DIR)/$*.cmx -c $(BUILD_DIR)/$*.ml
 
-.mly.mli:
-	$(OCAMLYACC) -v $<
+%.mli %.ml %.cmo: %.mly
+	$(OCAMLYACC) -v -b $(BUILD_DIR)/$* $<
+	$(OCAMLC) $(COMPFLAGS) -o $(BUILD_DIR)/$*.cmi -c $(BUILD_DIR)/$*.mli
+	$(OCAMLC) $(COMPFLAGS) -o $(BUILD_DIR)/$*.cmo -c $(BUILD_DIR)/$*.ml
 
 clean::
 	rm -f *.o *.cm* *.annot *.output
+	rm -rf $(BUILD_DIR)
 
-hello.native: meta.native
-	./meta.native hello.ml -o hello.native
+hello.native: foundation.cmx hello.cmx
+	./meta.native foundation.cmx hello.cmx -o hello.native
+
+foundation.cmx: foundation.ml meta.native
+	./meta.native -c foundation.ml
+
+hello.cmx: hello.ml meta.native
+	./meta.native -c hello.ml
+
+demo: hello.native
 	./hello.native
-
-hello.byte: meta.byte
-	./meta.byte hello.ml -o hello.byte
-	./hello.byte
 
 clean::
 	rm -f ./hello.{byte,native}
