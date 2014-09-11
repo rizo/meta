@@ -42,4 +42,4 @@ let () =
 
 - (Limited) Unicode support.
 - Compact lambda syntax.
-- Special _function application_ operator `\`.
+- Special _explicit application_ operator `\`.
