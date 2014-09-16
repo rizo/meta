@@ -21,11 +21,11 @@ default: build meta.native
 build:
 	mkdir -p build
 
-meta.byte: $(BYTE_OBJECTS)
+meta.byte: build $(BYTE_OBJECTS)
 	$(OCAMLC) -o $(BUILD_DIR)/$@ $(COMPFLAGS) $(BYTE_DEPS) $(BYTE_OBJECTS)
 	ln -s $(BUILD_DIR)/$@ ./$@
 
-meta.native: $(OPT_OBJECTS)
+meta.native: build $(OPT_OBJECTS)
 	$(OCAMLOPT) -o $(BUILD_DIR)/$@ $(COMPFLAGS) $(OPT_DEPS) $(OPT_OBJECTS)
 	ln -s $(BUILD_DIR)/$@ ./$@
 
