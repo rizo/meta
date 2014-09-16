@@ -15,7 +15,7 @@ open Clflags
 open Compenv
 
 module Optcompile = Optcompile_mod
-
+  
 
 let process_interface_file ppf name =
   Optcompile.interface ppf name (output_prefix name)
@@ -85,7 +85,6 @@ module Options = Main_args.Make_optcomp_options (struct
   let _ccopt s = first_ccopts := s :: !first_ccopts
   let _compact = clear optimize_for_speed
   let _config () = show_config ()
-  let _doc = set include_documentation
   let _for_pack s = for_package := Some s
   let _g = set debug
   let _i () = print_types := true; compile_only := true
@@ -118,6 +117,7 @@ module Options = Main_args.Make_optcomp_options (struct
   let _safe_string = clear unsafe_string
   let _short_paths = clear real_paths
   let _strict_sequence = set strict_sequence
+  let _strict_formats = set strict_formats
   let _shared () = shared := true; dlcode := true
   let _S = set keep_asm_file
   let _thread = set use_threads

@@ -14,7 +14,7 @@ open Config
 open Clflags
 open Compenv
 
-module Compile = Compile_mod
+modlule Compile = Compile_mod
 
 
 let process_interface_file ppf name =
@@ -88,7 +88,6 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _custom = set custom_runtime
   let _dllib s = dllibs := Misc.rev_split_words s @ !dllibs
   let _dllpath s = dllpaths := !dllpaths @ [s]
-  let _doc = set include_documentation
   let _for_pack s = for_package := Some s
   let _g = set debug
   let _i () = print_types := true; compile_only := true
@@ -119,6 +118,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let _safe_string = unset unsafe_string
   let _short_paths = unset real_paths
   let _strict_sequence = set strict_sequence
+  let _strict_formats = set strict_formats
   let _thread = set use_threads
   let _vmthread = set use_vmthreads
   let _unsafe = set fast
@@ -143,9 +143,7 @@ module Options = Main_args.Make_bytecomp_options (struct
   let anonymous = anonymous
 end)
 
-
 let main () =
-  print_endline "> main";
   try
     readenv ppf Before_args;
     Arg.parse Options.list anonymous usage;

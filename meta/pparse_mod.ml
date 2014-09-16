@@ -1,4 +1,3 @@
-
 (***********************************************************************)
 (*                                                                     *)
 (*                                OCaml                                *)
@@ -12,6 +11,9 @@
 (***********************************************************************)
 
 open Format
+
+module Parse = Parse_mod
+
 
 type error =
   | CannotRun of string
@@ -161,7 +163,7 @@ let file ppf ~tool_name inputfile parse_fun ast_magic =
     with x -> close_in ic; raise x
   in
   close_in ic;
-  ast
+  apply_rewriters ~tool_name ast_magic ast
 
 let report_error ppf = function
   | CannotRun cmd ->
@@ -178,18 +180,11 @@ let () =
       | _ -> None
     )
 
-let parse_all ~tool_name parse_fun doc_fun magic ppf sourcefile =
+let parse_all ~tool_name parse_fun magic ppf sourcefile =
   Location.input_name := sourcefile;
   let inputfile = preprocess sourcefile in
   let ast =
-    try
-      let ast = file ppf ~tool_name inputfile parse_fun magic in
-      let ast =
-        if !Clflags.include_documentation then
-          doc_fun sourcefile ast
-        else ast
-      in
-      apply_rewriters ~tool_name magic ast
+    try file ppf ~tool_name inputfile parse_fun magic
     with exn ->
       remove_preprocessed inputfile;
       raise exn
@@ -198,10 +193,8 @@ let parse_all ~tool_name parse_fun doc_fun magic ppf sourcefile =
   ast
 
 let parse_implementation ppf ~tool_name sourcefile =
-  parse_all ~tool_name Parse_mod.implementation Parsedoc.implementation
+  parse_all ~tool_name Parse.implementation
     Config.ast_impl_magic_number ppf sourcefile
-
 let parse_interface ppf ~tool_name sourcefile =
-  parse_all ~tool_name Parse_mod.interface Parsedoc.interface
+  parse_all ~tool_name Parse.interface
     Config.ast_intf_magic_number ppf sourcefile
-

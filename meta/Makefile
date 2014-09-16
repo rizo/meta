@@ -16,16 +16,16 @@ OPT_MODULES = parser_mod lexer_mod parse_mod pparse_mod optcompile_mod optmain_m
 OPT_OBJECTS = $(addsuffix .cmx, $(OPT_MODULES))
 OPT_DEPS    = ocamlcommon.cmxa ocamloptcomp.cmxa
 
-default: build meta.native
+default: meta.native
 
 build:
 	mkdir -p build
 
-meta.byte: $(BYTE_OBJECTS)
+meta.byte: build $(BYTE_OBJECTS)
 	$(OCAMLC) -o $(BUILD_DIR)/$@ $(COMPFLAGS) $(BYTE_DEPS) $(BYTE_OBJECTS)
 	ln -s $(BUILD_DIR)/$@ ./$@
 
-meta.native: $(OPT_OBJECTS)
+meta.native: build $(OPT_OBJECTS)
 	$(OCAMLOPT) -o $(BUILD_DIR)/$@ $(COMPFLAGS) $(OPT_DEPS) $(OPT_OBJECTS)
 	ln -s $(BUILD_DIR)/$@ ./$@
 
@@ -63,10 +63,10 @@ clean::
 hello.native: foundation.cmx hello.cmx
 	./meta.native foundation.cmx hello.cmx -o hello.native
 
-foundation.cmx: foundation.ml meta.native
+foundation.cmx: foundation.ml
 	./meta.native -c foundation.ml
 
-hello.cmx: hello.ml meta.native
+hello.cmx: hello.ml
 	./meta.native -c hello.ml
 
 demo: hello.native

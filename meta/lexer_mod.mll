@@ -61,6 +61,7 @@ let keyword_table =
     "match", MATCH;
     "method", METHOD;
     "module", MODULE;
+    "implicit", IMPLICIT;
     "mutable", MUTABLE;
     "new", NEW;
     "object", OBJECT;
@@ -289,13 +290,9 @@ rule token = parse
   | "\\" { INFIXOP1 "@@" }
   | "λ"  { FUN }
   | "λ" [' ' '\t' '\n'] * '|'
-         { FUNCTION }
-  | "¬"  { PREFIXOP "not" }
   | "∘"  { INFIXOP1 "<<" }
-  | "∧"  { INFIXOP1 "&&" }
-  | "∨"  { INFIXOP1 "||" }
-  | "⇔" { INFIXOP1 "<=>" }
-  | "⇒" { INFIXOP1 "=>" }
+
+
   | newline
       { update_loc lexbuf None 1 false 0;
         match !preprocessor with
@@ -447,7 +444,6 @@ rule token = parse
   | "="  { EQUAL }
   | "["  { LBRACKET }
   | "[|" { LBRACKETBAR }
-  | "⟦" { LBRACKETBAR }
   | "[<" { LBRACKETLESS }
   | "[>" { LBRACKETGREATER }
   | "]"  { RBRACKET }
@@ -456,7 +452,6 @@ rule token = parse
   | "|"  { BAR }
   | "||" { BARBAR }
   | "|]" { BARRBRACKET }
-  | "⟧" { BARRBRACKET }
   | ">"  { GREATER }
   | ">]" { GREATERRBRACKET }
   | "}"  { RBRACE }
